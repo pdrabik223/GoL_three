@@ -5,9 +5,11 @@ class Cell {
 
     constructor(scene, isAlive, x, y) {
         this.isAlive = isAlive
-        this.material = new THREE.MeshBasicMaterial({ color: 0xAAAAAA });
-        this.flor = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), this.material);
-        
+        this.material = new THREE.MeshBasicMaterial({ color: 0x2563eb, transparent: true, opacity: 0 });
+
+        const geometry = new THREE.PlaneGeometry(0.8, 0.8);
+        this.flor = new THREE.Mesh(geometry, this.material);
+
         if (isAlive)
             this.activate()
         else
@@ -20,11 +22,11 @@ class Cell {
 
     kill() {
         this.isAlive = false
-        this.flor.material.color.setHex(0xAAAAAA)
+        this.flor.material.opacity = 0
     }
     activate() {
         this.isAlive = true
-        this.flor.material.color.setHex(0x3030FF)
+        this.flor.material.opacity = 1
     }
 
     setState(isAlive) {

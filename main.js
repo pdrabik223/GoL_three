@@ -3,8 +3,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Cell } from './cell.js';
 import config from './config.json' with { type: 'json' };
 
-const material = new THREE.MeshBasicMaterial({ color: 0x696969 });
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xFFFFFF);
+
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
@@ -12,27 +13,33 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 
 
-const axesHelper = new THREE.AxesHelper(5);
+// const axesHelper = new THREE.AxesHelper(5);
 
 scene.add(camera);
-scene.add(axesHelper);
+// scene.add(axesHelper);
 
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-camera.position.z = 120
+camera.position.z = 100
 controls.update();
-
-const flor = new THREE.Mesh(new THREE.BoxGeometry(config["width"], 0.5, config["height"]), material);
-flor.position.y = -1
-// scene.add(flor);
 
 var grid = []
 var booleanGrid = []
 
 function getCell(x, y) {
-	if (x < 0 || y < 0) return false
-	if (x >= config["height"] || y >= config["width"]) return false
+	if (x < 0)
+		x = config["height"] - 1
+
+	if (y < 0)
+		y = config["width"] - 1
+
+	if (x >= config["height"])
+		x = 0
+
+	if (y >= config["width"])
+		y = 0
+
 	return grid[x][y].isAlive
 
 }
@@ -45,6 +52,7 @@ function init() {
 			booleanGrid[x].push(false)
 		}
 	}
+
 }
 
 function logic(x, y) {
@@ -86,11 +94,18 @@ function step() {
 		}
 	}
 }
-function animate() {
 
+var time = performance.now()
+var animationSpeed = 14 // in fps  
+function animate() {
 	requestAnimationFrame(animate);
-	renderer.render(scene, camera);
-	step();
+	var timeDiff = performance.now() - time
+	if (timeDiff > (1000 / animationSpeed)) {
+		time = performance.now()
+		renderer.render(scene, camera);
+		// camera.position.z += 0.1
+		step();
+	}
 	// console.log("frame!")
 }
 init();
